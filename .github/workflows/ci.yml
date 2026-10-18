@@ -1,4 +1,4 @@
-Name: Lab 3 - CI/CD Security Pipeline
+name: Lab 3 - CI/CD Security Pipeline
 
 on:
   push:
