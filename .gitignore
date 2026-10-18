@@ -1,0 +1,28 @@
+# Java and Maven
+target/
+*.class
+*.jar
+*.war
+
+# Logs and crash dumps
+*.log
+hs_err_pid*
+replay_pid*
+
+# Environment files and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*
+secrets*
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# Operating system files
+.DS_Store
+Thumbs.db
