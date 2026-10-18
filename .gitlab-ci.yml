@@ -1,0 +1,54 @@
+
+stages:
+  - build
+  - security
+  - publish
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+
+# Stage 1: Compile the Java application and run unit tests
+build_test:
+  stage: build
+  image: maven:3.9-eclipse-temurin-21
+  script:
+    - echo "Building and testing the Java application"
+    - mvn --batch-mode clean package
+  artifacts:
+    paths:
+      - target/devops-lab-app-1.0.0.jar
+    expire_in: 1 day
+
+# Stage 2: Scan source code and dependencies
+security_scan:
+  stage: security
+  image:
+    name: aquasec/trivy:0.76.0
+    entrypoint: [""]
+  dependencies: []
+  script:
+    - trivy fs --scanners vuln,secret --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 .
+
+# Stage 3: Build and publish the Docker image
+publish_docker:
+  stage: publish
+  image: docker:27.5.1-cli
+  services:
+    - name: docker:27.5.1-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_VERIFY: "1"
+    DOCKER_CERT_PATH: "/certs/client"
+  dependencies:
+    - build_test
+  before_script:
+    - echo "$DOCKERHUB_TOKEN" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+  script:
+    - docker build --pull -t yacks/devops-lab-app:1.0.0 -t yacks/devops-lab-app:latest .
+    - docker push yacks/devops-lab-app:1.0.0
+    - docker push yacks/devops-lab-app:latest
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
