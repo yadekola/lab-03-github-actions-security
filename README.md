@@ -1,6 +1,6 @@
 # Lab 3: CI/CD with GitHub Actions, Security Scanning and Secrets
 
-#### Objective
+## Objective
 
 Build an independent CI/CD lab that uses GitHub Actions and GitLab CI
 to build, test, scan, and package a Java application in Docker.
