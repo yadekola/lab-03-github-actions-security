@@ -1,54 +1,157 @@
-# Lab 3: CI/CD with GitHub Actions, Security Scanning and Secrets
 
-## Objective
+# Lab 3: CI/CD Security Pipeline
 
-Build an independent CI/CD lab that uses GitHub Actions and GitLab CI
-to build, test, scan, and package a Java application in Docker.
+A hands-on DevOps project demonstrating how to build, test, scan, and publish a Java application using GitHub Actions, Maven, Trivy, Docker, and Docker Hub.
 
-The lab also compares Jenkins, GitHub Actions, and GitLab CI.
+This project is part of my practical DevOps learning journey. My goal is to understand how automation and security checks help teams deliver applications more reliably.
 
-## Learning objectives
+## Project Objectives
 
-- Understand CI/CD workflows, jobs, steps, and dependencies.
-- Run a Maven build and automated tests.
-- Run security scanning and fail the pipeline when required checks fail.
-- Store registry credentials securely.
+- Automate Java application builds and tests with Maven.
+- Create a CI/CD workflow using GitHub Actions.
+- Scan source code and dependencies with Trivy.
+- Store credentials securely using GitHub Actions repository secrets.
 - Build and publish a Docker image to Docker Hub.
-- Restrict image publishing to the main branch.
-- Recreate the core pipeline in GitLab CI.
-- Compare three CI/CD tools using practical experience.
+- Reproduce the pipeline with GitLab CI.
+- Compare Jenkins, GitHub Actions, and GitLab CI.
+- Document the architecture and prepare for DevOps interviews.
 
-## Planned pipeline
+## Tools and Technologies
 
-1. Build the Java application.
-2. Run automated tests.
-3. Scan application dependencies for vulnerabilities.
-4. Build and publish a Docker image when the required checks pass
-   and the workflow runs on main.
+| Tool | Purpose |
+|---|---|
+| Java 21 | Application programming language |
+| Maven | Build automation and test execution |
+| JUnit 5 | Unit testing |
+| Git and GitHub | Version control and source code hosting |
+| GitHub Actions | CI/CD workflow automation |
+| Trivy | Source and dependency security scanning |
+| Docker | Container image creation |
+| Docker Hub | Container image registry |
+| GitLab CI | Planned alternative CI/CD implementation |
 
-## Repository structure
+## Application Overview
 
-- `.github/workflows/` - GitHub Actions workflows.
-- `architecture/` - Pipeline architecture diagram.
-- `scripts/` - Helper scripts used by the lab.
-- `comparison.md` - Jenkins vs GitHub Actions vs GitLab CI.
-- `answers.md` - Lab interview questions.
+The application is a simple Java program that returns:
 
-## Security principles
+`DevOps Lab App is running!`
 
-- Never commit passwords, access keys, or tokens.
-- Store registry credentials in GitHub Actions secrets and GitLab CI variables.
-- Use least-privilege permissions.
-- Do not publish images from untrusted pull requests.
-- Pin third-party workflow actions to reviewed versions or commit SHAs.
+A JUnit test checks that the application returns the expected message.
 
-## Progress
+The project uses a Dockerfile to package the compiled Java application into a container image.
 
-- [x] Create an independent lab repository.
-- [ ] Create the Java/Maven application.
-- [ ] Configure GitHub Actions build and test jobs.
-- [ ] Add security scanning.
-- [ ] Build and publish the Docker image.
-- [ ] Reproduce the core pipeline in GitLab CI.
-- [ ] Complete the architecture diagram and tool comparison.
-- [ ] Answer the interview questions.
+## GitHub Actions Pipeline
+
+The workflow is defined in:
+
+`.github/workflows/ci.yml`
+
+### Job 1: Build, Test and Security Scan
+
+1. Check out the source code.
+2. Set up Java 21 and Maven caching.
+3. Build the application and run unit tests.
+4. Scan the source code and dependencies with Trivy.
+5. Upload the generated JAR as a workflow artifact.
+
+### Job 2: Publish Docker Image
+
+This job depends on the successful completion of the first job and runs only for pushes to the `main` branch.
+
+1. Check out the source code.
+2. Download the application JAR.
+3. Set up Docker Buildx.
+4. Authenticate with Docker Hub using GitHub repository secrets.
+5. Build and publish the Docker image.
+
+The configured image tags are:
+
+- `yacks/devops-lab-app:1.0.0`
+- `yacks/devops-lab-app:latest`
+
+Docker Hub repository:
+
+https://hub.docker.com/r/yacks/devops-lab-app
+
+## Security Practices
+
+- Docker Hub credentials are stored in GitHub Actions repository secrets.
+- Access tokens are not stored in the source code.
+- GitHub Actions permissions are restricted to read repository contents.
+- Trivy is configured to check for HIGH and CRITICAL vulnerabilities and secrets.
+- The publishing job depends on the build, test, and security job.
+
+Note: The current Trivy configuration uses `ignore-unfixed: true`. Security findings must still be reviewed when they occur.
+
+## Repository Structure
+
+```text
+lab-03-github-actions-security/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── architecture/
+├── scripts/
+├── src/
+│   ├── main/
+│   │   └── java/
+│   │       └── com/yadekola/devopslab/
+│   │           └── App.java
+│   └── test/
+│       └── java/
+│           └── com/yadekola/devopslab/
+│               └── AppTest.java
+├── .gitignore
+├── Dockerfile
+├── pom.xml
+├── README.md
+├── answers.md
+├── comparison.md
+└── .gitlab-ci.yml
+```
+
+Some listed files and directories are planned deliverables and may not be present yet.
+
+## Project Progress
+
+- [x] Create an independent GitHub repository.
+- [x] Build the Java application.
+- [x] Add a JUnit unit test.
+- [x] Build and run the application locally.
+- [x] Create the Docker image locally.
+- [x] Push and pull the image from Docker Hub.
+- [x] Configure the GitHub Actions workflow.
+- [x] Automate Maven build and testing.
+- [x] Add Trivy security scanning.
+- [x] Configure GitHub repository secrets.
+- [x] Publish Docker images through GitHub Actions.
+- [ ] Reproduce the pipeline using GitLab CI.
+- [ ] Complete the Jenkins, GitHub Actions, and GitLab CI comparison.
+- [ ] Complete the DevOps interview answers.
+- [ ] Create the CI/CD architecture diagram.
+
+## What I Learned
+
+This project helped me practise CI/CD automation, unit testing, security scanning, Docker image publishing, and secure credential management.
+
+I also learned how to troubleshoot workflow failures by examining GitHub Actions logs, checking action references, and verifying whether repository secrets were available to the runner.
+
+## Future Improvements
+
+- Pin third-party GitHub Actions to verified commit SHAs.
+- Review and update actions for supported Node.js runtimes.
+- Add image vulnerability scanning before publishing.
+- Improve dependency and container security checks.
+- Reproduce the pipeline in GitLab CI.
+- Add an architecture diagram and detailed troubleshooting notes.
+
+## Author
+
+Yakub Adekola Ojo
+
+DevOps Learner | Entrepreneurship Student
+
+GitHub: https://github.com/yadekola
+
+Docker Hub: https://hub.docker.com/r/yacks/devops-lab-app
+
